@@ -2,13 +2,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import BlogSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import Blog
 
 
 class PostView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
     serializer_class = BlogSerializer
 
@@ -26,16 +26,31 @@ class PostView(APIView):
 
     def get(self,request):
         try:
-            blogs=Blog.objects.filter(user=request.user)
+            blogs=Blog.objects.all()
             serializer=self.serializer_class(blogs,many=True)
             return Response(serializer.data,status=200)
         except Exception as e:
             return Response({'error': str(e)}, status = 500) 
     
-    def patch(self, request):
+
+class PostSpecificView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = BlogSerializer
+
+    def get(self,request, pk):
+        try:
+            print(pk)
+            blogs=Blog.objects.filter(uid = pk)
+            serializer=self.serializer_class(blogs,many=True)
+            return Response(serializer.data,status=200)
+        except Exception as e:
+            return Response({'error': str(e)}, status = 500) 
+    
+    def patch(self, request, pk):
         try:
             data=request.data
-            blog=Blog.objects.filter(uid = data.get('uid'))
+            blog=Blog.objects.filter(uid = pk)
             
             if not blog.exists():
                 return Response({'error': 'Blog does not exist'}, status = 400)
@@ -51,6 +66,8 @@ class PostView(APIView):
             return Response(serializer.errors, status = 400)
         except Exception as e:
             return Response({'errore': str(e)}, status = 500)
+
+
 
     # Create your views here.
 
