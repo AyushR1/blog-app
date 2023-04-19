@@ -40,12 +40,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "users",
     "posts",
-    'allauth',
-    'allauth.account',
-    'django.contrib.sites',
 ]
-
-SITE_ID=1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -88,9 +83,6 @@ DATABASES = {
     }
 }
 
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
