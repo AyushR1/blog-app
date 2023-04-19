@@ -38,6 +38,23 @@ class PostSpecificView(APIView):
     authentication_classes = [JWTAuthentication]
     serializer_class = BlogSerializer
 
+    def delete(self, request, pk):
+        try:
+            blog=Blog.objects.filter(uid = pk)
+            
+            if not blog.exists():
+                return Response({'error': 'Blog does not exist'}, status = 400)
+
+            # if request.user.id != blog[0].user.id:
+            #     return Response({'error': 'You are not authorized to delete this blog'}, status = 400)
+            
+            blog.delete()
+            return Response({'message': 'Blog deleted successfully'}, status = 200)
+        except Exception as e:
+            return Response({'errore': str(e)}, status = 500)
+
+
+
     def get(self,request, pk):
         try:
             print(pk)
@@ -50,6 +67,7 @@ class PostSpecificView(APIView):
     def patch(self, request, pk):
         try:
             data=request.data
+            data['user']=request.user.id
             blog=Blog.objects.filter(uid = pk)
             
             if not blog.exists():
@@ -66,7 +84,7 @@ class PostSpecificView(APIView):
             return Response(serializer.errors, status = 400)
         except Exception as e:
             return Response({'errore': str(e)}, status = 500)
-
+        
 
 
     # Create your views here.
