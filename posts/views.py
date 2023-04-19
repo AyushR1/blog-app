@@ -5,7 +5,7 @@ from .serializers import BlogSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import Blog
-
+from django.core.paginator import Paginator
 
 class PostView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -27,7 +27,12 @@ class PostView(APIView):
     def get(self,request):
         try:
             blogs=Blog.objects.all()
-            serializer=self.serializer_class(blogs,many=True)
+           
+            page_number = request.GET.get('page', 1)
+            paginator = Paginator(blogs, 1)
+            print("Ho")
+            serializer=self.serializer_class(paginator.page(page_number),many=True)
+            
             return Response(serializer.data,status=200)
         except Exception as e:
             return Response({'error': str(e)}, status = 500) 
