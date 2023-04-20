@@ -18,8 +18,9 @@ class UserRegistrationTestCase(APITestCase):
 
 class UserLoginTestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
-    
+        self.user = User.objects.create_user(
+            username='testuser', password='testpassword')
+
     def test_login(self):
         data = {'username': 'testuser', 'password': 'testpassword'}
         response = self.client.post('/api/login/', data)
@@ -30,8 +31,9 @@ class UserLoginTestCase(APITestCase):
 
 class PostBlogTestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
-    
+        self.user = User.objects.create_user(
+            username='testuser', password='testpassword')
+
     def test_post_list(self):
         image_io = io.BytesIO()
         image = Image.new('RGB', (100, 100), color='red')
@@ -39,18 +41,27 @@ class PostBlogTestCase(APITestCase):
         image_io.seek(0)
 
         # create a SimpleUploadedFile object from the new image file
-        image_file = SimpleUploadedFile("test_image.jpg", image_io.read(), content_type="image/jpeg")
+        image_file = SimpleUploadedFile(
+            "test_image.jpg",
+            image_io.read(),
+            content_type="image/jpeg")
 
         login_data = {'username': 'testuser', 'password': 'testpassword'}
         login_response = self.client.post('/api/login/', login_data)
         access_token = login_response.data['access']
         auth_head = {'Authorization': f'Bearer {access_token}'}
 
-        
         # create the data dictionary with image and other fields
-        data = {'title':'Test Post', 'description':'This is a test post', 'image': image_file}
-        
-        response = self.client.post('/api/posts/', data, headers=auth_head, format='multipart')
+        data = {
+            'title': 'Test Post',
+            'description': 'This is a test post',
+            'image': image_file}
+
+        response = self.client.post(
+            '/api/posts/',
+            data,
+            headers=auth_head,
+            format='multipart')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(len(response.data), 5)
         self.assertEqual(response.data['title'], 'Test Post')
@@ -62,17 +73,26 @@ class PostBlogTestCase(APITestCase):
         image_io.seek(0)
 
         # create a SimpleUploadedFile object from the new image file
-        image_file = SimpleUploadedFile("test_image.jpg", image_io.read(), content_type="image/jpeg")
+        image_file = SimpleUploadedFile(
+            "test_image.jpg",
+            image_io.read(),
+            content_type="image/jpeg")
 
         login_data = {'username': 'testuser', 'password': 'testpassword'}
         login_response = self.client.post('/api/login/', login_data)
         access_token = login_response.data['access']
         auth_head = {'Authorization': f'Bearer {access_token}'}
 
-        
         # create the data dictionary with image and other fields
-        data = {'title':'Test Post', 'description':'This is a test post', 'image': image_file}
-        response = self.client.post('/api/posts/', data, headers=auth_head, format='multipart')
+        data = {
+            'title': 'Test Post',
+            'description': 'This is a test post',
+            'image': image_file}
+        response = self.client.post(
+            '/api/posts/',
+            data,
+            headers=auth_head,
+            format='multipart')
         response = self.client.get('/api/posts/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
