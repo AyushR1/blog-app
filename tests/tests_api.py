@@ -55,4 +55,24 @@ class PostBlogTestCase(APITestCase):
         self.assertEqual(len(response.data), 5)
         self.assertEqual(response.data['title'], 'Test Post')
 
+    def test_post_list(self):
+        image_io = io.BytesIO()
+        image = Image.new('RGB', (100, 100), color='red')
+        image.save(image_io, 'JPEG')
+        image_io.seek(0)
 
+        # create a SimpleUploadedFile object from the new image file
+        image_file = SimpleUploadedFile("test_image.jpg", image_io.read(), content_type="image/jpeg")
+
+        login_data = {'username': 'testuser', 'password': 'testpassword'}
+        login_response = self.client.post('/api/login/', login_data)
+        access_token = login_response.data['access']
+        auth_head = {'Authorization': f'Bearer {access_token}'}
+
+        
+        # create the data dictionary with image and other fields
+        data = {'title':'Test Post', 'description':'This is a test post', 'image': image_file}
+        response = self.client.post('/api/posts/', data, headers=auth_head, format='multipart')
+        response = self.client.get('/api/posts/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
