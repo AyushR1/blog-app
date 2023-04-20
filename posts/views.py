@@ -47,7 +47,7 @@ class PostSpecificView(APIView):
 
     def delete(self, request, pk):
         try:
-            blog = Blog.objects.filter(uid=pk)
+            blog = Blog.objects.filter(id=pk)
 
             if not blog.exists():
                 return Response({'error': 'Blog does not exist'}, status=400)
@@ -65,7 +65,7 @@ class PostSpecificView(APIView):
     def get(self, request, pk):
         try:
             print(pk)
-            blogs = Blog.objects.filter(uid=pk)
+            blogs = Blog.objects.filter(id=pk)
             serializer = self.serializer_class(blogs, many=True)
             return Response(serializer.data, status=200)
         except Exception as e:
@@ -75,7 +75,7 @@ class PostSpecificView(APIView):
         try:
             data = request.data
             data['user'] = request.user.id
-            blog = Blog.objects.filter(uid=pk)
+            blog = Blog.objects.filter(id=pk)
 
             if not blog.exists():
                 return Response({'error': 'Blog does not exist'}, status=400)
